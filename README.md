@@ -79,8 +79,6 @@ Consulte `docs/environment.md` para a lista completa. As principais:
 4. Respeite as regras de lint e formato do projeto.
 
 ## Licença
-(Aqui coloque a licença do projeto, ex.: MIT)  
-Se quiser, eu adiciono um arquivo LICENSE com o texto correspondente.
-
+MIT
 ## Contato
 Para dúvidas ou integração: icidade (no GitHub) — https://github.com/icidade
