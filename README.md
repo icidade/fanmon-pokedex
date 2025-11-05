@@ -1,61 +1,86 @@
-## Fanmon Pokédex
+# Fanmon Pokédex
 
-Aplicação Next.js para administrar e consultar uma Pokédex personalizada. Inclui backend com Prisma/PostgreSQL, autenticação via NextAuth e painel administrativo para CRUD completo de gerações, tipos e Pokémon.
+Aplicação Next.js para administrar e consultar uma Pokédex personalizada. Inclui backend com Prisma/SQLite, autenticação via NextAuth e painel administrativo para CRUD de gerações, tipos e Pokémon.
+
+## Destaques
+- Painel administrativo protegido (roles ADMIN/EDITOR).
+- CRUD para gerações, tipos (relacionamentos: forte, fraco, imune) e Pokémon.
+- Upload local de imagem/áudio (armazenados em `public/uploads`).
+- Validação com Zod e ORM Prisma (SQLite).
 
 ## Pré-requisitos
-
 - Node.js 20+
-- Banco PostgreSQL acessível
-- Variáveis de ambiente configuradas (`docs/environment.md`)
+- Banco SQLite (arquivo) acessível no projeto
+- Variáveis de ambiente configuradas (veja `docs/environment.md`)
 
-## Setup
-
-1. Instale as dependências:
-
+## Instalação (desenvolvimento)
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/icidade/fanmon-pokedex.git
+   cd fanmon-pokedex
+   ```
+2. Instale dependências:
    ```bash
    npm install
    ```
-
-2. Crie o arquivo `.env.local` seguindo o guia em `docs/environment.md`.
-
-3. Gere as tabelas do banco (usa o SQL do diretório `prisma/migrations`):
-
+3. Crie `.env.local` seguindo `docs/environment.md`. Um exemplo de `DATABASE_URL` para SQLite:
+   ```env
+   DATABASE_URL="file:./dev.db"
+   ```
+4. Execute migrações:
    ```bash
    npx prisma migrate deploy
    ```
-
-4. Execute o servidor de desenvolvimento:
-
+   (ou `npx prisma migrate dev` em ambiente local para gerar migrações)
+5. Inicie em modo de desenvolvimento:
    ```bash
    npm run dev
    ```
-
-   A aplicação ficará disponível em [http://localhost:3000](http://localhost:3000).
-
-## Painel administrativo
-
-- URL: `/dashboard`
-- Protegido por login (usuário com papel `ADMIN` ou `EDITOR`).
-- Funcionalidades:
-  - CRUD de gerações.
-  - CRUD de tipos com gerenciamento de relacionamentos (forte, fraco, imune).
-  - CRUD de Pokémon com campos principais, estatísticas base e upload local de imagem/áudio principal (arquivos armazenados em `public/uploads`).
-
-A tela de login está em `/login` e utiliza o provider de credenciais do NextAuth.
+   A aplicação ficará disponível em http://localhost:3000
 
 ## Scripts úteis
+- `npm run dev` — servidor de desenvolvimento
+- `npm run build` — build de produção
+- `npm run start` — inicia a build em produção
+- `npm run lint` — executa ESLint
+- `npx prisma studio` — inspecionar dados localmente
 
-- `npm run dev`: servidor de desenvolvimento.
-- `npm run build`: build de produção.
-- `npm run start`: inicia a build.
-- `npm run lint`: executa o ESLint.
+## Painel administrativo
+- URL: `/dashboard`
+- A tela de login está em `/login` (provider de credenciais do NextAuth).
+- Permissões: usuários com papel `ADMIN` ou `EDITOR` podem acessar o painel.
+- Funcionalidades:
+  - CRUD de gerações.
+  - CRUD de tipos com gerenciamento de relações (forte, fraco, imune).
+  - CRUD de Pokémon: campos principais, estatísticas base e upload local de imagem/áudio.
 
-## Estrutura
+## Estrutura do projeto
+- `src/app/api` — rotas REST autenticadas (gerações, tipos, Pokémon e autenticação).
+- `src/app/dashboard` — páginas do painel administrativo.
+- `src/lib` — Prisma Client, autenticação, validações Zod e utilitários.
+- `src/components` — formulários e componentes reutilizáveis.
+- `prisma/schema.prisma` — definição do banco de dados.
 
-- `src/app/api`: rotas REST autenticadas para gerações, tipos, Pokémon e autenticação.
-- `src/app/dashboard`: painel administrativo protegido e suas páginas.
-- `src/lib`: Prisma Client, utilitários de autenticação, validações com Zod.
-- `src/components`: formulários e componentes reutilizáveis do painel.
-- `prisma/schema.prisma`: definição do banco de dados.
+## Variáveis de ambiente
+Consulte `docs/environment.md` para a lista completa. As principais:
+- DATABASE_URL — conexão (ex.: `file:./dev.db` para SQLite)
+- NEXTAUTH_URL — URL da aplicação (ex.: http://localhost:3000)
+- NEXTAUTH_SECRET — segredo do NextAuth
+- (outros conforme `docs/environment.md`)
 
-Consulte `docs/environment.md` para entender todas as variáveis de ambiente necessárias.
+## Banco de dados e seed
+- Migrações: `npx prisma migrate deploy`
+- Para popular dados de teste (se houver script de seed): execute o script de seed documentado no projeto ou use `npx prisma db seed` se configurado.
+
+## Contribuição
+1. Abra uma issue descrevendo a proposta ou bug.
+2. Faça um fork e crie uma branch com o prefixo `feature/` ou `fix/`.
+3. Faça commits claros e um PR para `main`.
+4. Respeite as regras de lint e formato do projeto.
+
+## Licença
+(Aqui coloque a licença do projeto, ex.: MIT)  
+Se quiser, eu adiciono um arquivo LICENSE com o texto correspondente.
+
+## Contato
+Para dúvidas ou integração: icidade (no GitHub) — https://github.com/icidade
