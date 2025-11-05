@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum TypeRelationKind {
+  STRONG_AGAINST
+  WEAK_AGAINST
+  IMMUNE_TO
+}
+
+enum MediaKind {
+  IMAGE
+  AUDIO
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  name           String?
+  passwordHash   String
+  role           Role      @default(ADMIN)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  createdPokemons Pokemon[] @relation("UserCreatedPokemons")
+  updatedPokemons Pokemon[] @relation("UserUpdatedPokemons")
+}
+
+model Generation {
+  id          String    @id @default(uuid())
+  name        String
+  number      Int       @unique
+  description String?
+  releasedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  pokemons    Pokemon[]
+}
+
+model Type {
+  id                  String              @id @default(uuid())
+  name                String              @unique
+  slug                String              @unique
+  description         String?
+  colorHex            String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  pokemonTypes        PokemonType[]
+  relationshipsFrom   TypeRelationship[]  @relation("TypeRelationshipsFromSource")
+  relationshipsTo     TypeRelationship[]  @relation("TypeRelationshipsToTarget")
+}
+
+model TypeRelationship {
+  id           String            @id @default(uuid())
+  sourceTypeId String
+  targetTypeId String
+  relation     TypeRelationKind
+  createdAt    DateTime          @default(now())
+
+  sourceType Type @relation("TypeRelationshipsFromSource", fields: [sourceTypeId], references: [id], onDelete: Cascade)
+  targetType Type @relation("TypeRelationshipsToTarget", fields: [targetTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceTypeId, targetTypeId, relation])
+}
+
+model Pokemon {
+  id              String            @id @default(uuid())
+  name            String
+  slug            String            @unique
+  indexNumber     Int
+  generationId    String
+  classification  String?
+  description     String?
+  heightMeters    Float?
+  weightKilograms Float?
+  primaryImageMediaId String? @unique
+  primaryAudioMediaId String? @unique
+  baseHp          Int?
+  baseAttack      Int?
+  baseDefense     Int?
+  baseSpAttack    Int?
+  baseSpDefense   Int?
+  baseSpeed       Int?
+  isLegendary     Boolean          @default(false)
+  isMythical      Boolean          @default(false)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  createdById     String?
+  updatedById     String?
+
+  generation Generation @relation(fields: [generationId], references: [id])
+  createdBy  User?      @relation("UserCreatedPokemons", fields: [createdById], references: [id])
+  updatedBy  User?      @relation("UserUpdatedPokemons", fields: [updatedById], references: [id])
+  types      PokemonType[]
+  media      PokemonMedia[]
+  primaryImageMedia PokemonMedia? @relation("PrimaryImageMedia", fields: [primaryImageMediaId], references: [id])
+  primaryAudioMedia PokemonMedia? @relation("PrimaryAudioMedia", fields: [primaryAudioMediaId], references: [id])
+  evolutionsFrom PokemonEvolution[] @relation("EvolutionsFrom")
+  evolutionsTo   PokemonEvolution[] @relation("EvolutionsTo")
+
+  @@unique([indexNumber, generationId])
+}
+
+model PokemonType {
+  pokemonId String
+  typeId    String
+  slot      Int       @default(1)
+
+  pokemon Pokemon @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+  type    Type    @relation(fields: [typeId], references: [id], onDelete: Cascade)
+
+  @@id([pokemonId, typeId])
+  @@unique([pokemonId, slot])
+}
+
+model PokemonEvolution {
+  id            String   @id @default(uuid())
+  fromPokemonId String?
+  toPokemonId   String?
+  trigger       String?
+  level         Int?
+  details       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  fromPokemon Pokemon? @relation("EvolutionsFrom", fields: [fromPokemonId], references: [id])
+  toPokemon   Pokemon? @relation("EvolutionsTo", fields: [toPokemonId], references: [id])
+
+  @@unique([fromPokemonId, toPokemonId])
+}
+
+
+model PokemonMedia {
+  id         String     @id @default(uuid())
+  pokemonId  String
+  kind       MediaKind
+  url        String
+  title      String?
+  isPrimary  Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  pokemon Pokemon @relation(fields: [pokemonId], references: [id], onDelete: Cascade)
+  primaryImageFor Pokemon? @relation("PrimaryImageMedia")
+  primaryAudioFor Pokemon? @relation("PrimaryAudioMedia")
+}
+
