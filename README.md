@@ -80,5 +80,15 @@ Consulte `docs/environment.md` para a lista completa. As principais:
 
 ## Licença
 MIT
+
+## Disclaimer
+
+This is a **fan-made project** created for educational and non-commercial purposes.  
+**Pokémon** and all related names, images, and assets are trademarks and copyrights of  
+**Nintendo, Game Freak, and The Pokémon Company**.  
+
+This project is **not affiliated with, endorsed, or sponsored by** these entities.  
+All Pokémon-related intellectual property belongs to their respective owners.
+
 ## Contato
 Para dúvidas ou integração: icidade (no GitHub) — https://github.com/icidade
